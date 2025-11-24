@@ -4,8 +4,8 @@ const shouldUseProxy =
 const apiRoot = shouldUseProxy
   ? ''
   : localHosts.has(window.location.hostname)
-    ? 'http://localhost:3000'
-    : 'http://backend:3000';
+        ? 'http://localhost:3000' 
+        : 'http://91.99.61.249:6970';
 const itemsEndpoint = shouldUseProxy ? '/items' : `${apiRoot}/items`;
 
 const fetchBtn = document.getElementById('fetch-btn');
