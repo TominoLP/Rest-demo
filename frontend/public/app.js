@@ -335,42 +335,65 @@ const renderItems = (items) => {
   if (!items.length) {
     const emptyState = document.createElement('p');
     emptyState.textContent = 'Noch keine Artikel vorhanden.';
+    emptyState.className = 'text-sm text-slate-500 italic';
     itemsContainer.appendChild(emptyState);
     return;
   }
 
   items.forEach((item) => {
     const card = document.createElement('div');
-    card.className = 'item-card';
+    card.className =
+      'flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 shadow-sm';
+
+    const idBadge = document.createElement('span');
+    idBadge.textContent = `#${item.id}`;
+    idBadge.className = 'text-xs font-semibold uppercase tracking-widest text-slate-500';
 
     const nameLabel = document.createElement('label');
     nameLabel.textContent = 'Name';
+    nameLabel.className =
+      'flex min-w-[160px] flex-1 flex-col gap-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-500';
     const nameInput = document.createElement('input');
     nameInput.value = item.name;
+    nameInput.className =
+      'rounded-2xl border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300';
     nameLabel.appendChild(nameInput);
 
     const qtyLabel = document.createElement('label');
     qtyLabel.textContent = 'Anzahl';
+    qtyLabel.className =
+      'flex min-w-[120px] flex-col gap-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-500';
     const qtyInput = document.createElement('input');
     qtyInput.type = 'number';
     qtyInput.value = item.quantity;
+    qtyInput.className =
+      'rounded-2xl border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300';
     qtyLabel.appendChild(qtyInput);
+
+    const buttonGroup = document.createElement('div');
+    buttonGroup.className = 'flex gap-2';
 
     const updateBtn = document.createElement('button');
     updateBtn.textContent = 'PUT';
+    updateBtn.className =
+      'rounded-full bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow hover:bg-indigo-700 transition';
     updateBtn.addEventListener('click', () => {
       updateItem(item.id, nameInput.value.trim(), Number(qtyInput.value));
     });
 
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'DELETE';
+    deleteBtn.className =
+      'rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow hover:bg-rose-600 transition';
     deleteBtn.addEventListener('click', () => deleteItem(item.id));
 
-    card.appendChild(document.createTextNode(`#${item.id}`));
+    buttonGroup.appendChild(updateBtn);
+    buttonGroup.appendChild(deleteBtn);
+
+    card.appendChild(idBadge);
     card.appendChild(nameLabel);
     card.appendChild(qtyLabel);
-    card.appendChild(updateBtn);
-    card.appendChild(deleteBtn);
+    card.appendChild(buttonGroup);
 
     itemsContainer.appendChild(card);
   });

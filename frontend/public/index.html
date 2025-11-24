@@ -4,475 +4,180 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>REST Demo</title>
-    <style>
-      :root {
-        color-scheme: light;
-        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        --bg: linear-gradient(135deg, #f0f4ff 0%, #fdf2ff 100%);
-        --surface: #ffffff;
-        --border: #d9e1ec;
-        --shadow: rgba(15, 23, 42, 0.08);
-        --primary: #4b6bfb;
-        --primary-dark: #3a4fd0;
-        --text: #1f2937;
-        --muted: #6b7280;
-      }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        background: var(--bg);
-        color: var(--text);
-      }
-
-      .page {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 2rem clamp(1.25rem, 4vw, 3rem) 3rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-
-      header {
-        border-radius: 24px;
-        padding: clamp(1.5rem, 5vw, 3rem);
-        background: radial-gradient(circle at top left, rgba(75, 107, 251, 0.15), transparent 50%),
-          radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.15), transparent 55%), var(--surface);
-        box-shadow: 0 15px 60px rgba(15, 23, 42, 0.15);
-      }
-
-      header h1 {
-        font-size: clamp(2rem, 3vw, 2.8rem);
-        margin-bottom: 0.5rem;
-      }
-
-      header p {
-        color: var(--muted);
-        font-size: 1.1rem;
-        max-width: 56ch;
-      }
-
-      main {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-
-      section {
-        background: var(--surface);
-        padding: 1.5rem;
-        border-radius: 18px;
-        border: 1px solid var(--border);
-        box-shadow: 0 8px 30px var(--shadow);
-      }
-
-      button {
-        cursor: pointer;
-        border: none;
-        border-radius: 999px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-        background: var(--primary);
-        color: #fff;
-        letter-spacing: 0.05em;
-        transition: background 0.2s ease, transform 0.2s ease;
-      }
-
-      button:hover {
-        background: var(--primary-dark);
-        transform: translateY(-1px);
-      }
-
-      .method-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.95rem;
-        padding: 0.35rem 0.9rem;
-        border-radius: 999px;
-        background: rgba(79, 70, 229, 0.08);
-        color: var(--primary-dark);
-        font-weight: 600;
-      }
-
-      .items-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .item-card {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 0.75rem;
-        align-items: center;
-        border: 1px solid var(--border);
-        padding: 0.75rem;
-        border-radius: 12px;
-        background: #f8fbff;
-      }
-
-      label {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: var(--muted);
-        gap: 0.25rem;
-      }
-
-      input {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        font-size: 1rem;
-        color: var(--text);
-        background: #fff;
-      }
-
-      input:focus {
-        outline: 2px solid rgba(75, 107, 251, 0.4);
-        outline-offset: 1px;
-      }
-
-      pre {
-        background: #0f172a;
-        color: #e0f2ff;
-        padding: 1rem;
-        border-radius: 16px;
-        overflow-x: auto;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.3);
-      }
-
-      #status {
-        min-height: 1.5rem;
-        color: #059669;
-        font-weight: 600;
-      }
-
-      .layout-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1rem;
-      }
-
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-      }
-
-      .info-card {
-        border-radius: 16px;
-        border: 1px solid var(--border);
-        padding: 1.25rem;
-        background: #fdfdff;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .info-card h3 {
-        margin-top: 0;
-        margin-bottom: 0.5rem;
-      }
-
-      .info-card p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .info-card .tag {
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--primary-dark);
-      }
-
-      .hero-list {
-        list-style: none;
-        padding: 0;
-        margin: 1.25rem 0 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 0.75rem 1.5rem;
-      }
-
-      .hero-list li {
-        display: flex;
-        gap: 0.5rem;
-        color: var(--muted);
-        line-height: 1.4;
-      }
-
-      .hero-list strong {
-        color: var(--text);
-      }
-
-      .status-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1rem;
-      }
-
-      .btn-secondary {
-        background: #475569;
-      }
-
-      .btn-secondary:hover {
-        background: #334155;
-      }
-
-      .btn-warning {
-        background: #f97316;
-      }
-
-      .btn-warning:hover {
-        background: #ea580c;
-      }
-
-      .btn-danger {
-        background: #ef4444;
-      }
-
-      .btn-danger:hover {
-        background: #dc2626;
-      }
-
-      .btn-teapot {
-        background: linear-gradient(120deg, #f472b6, #facc15);
-        color: #1f2937;
-      }
-
-      .btn-teapot:hover {
-        background: linear-gradient(120deg, #f472b6, #f97316);
-      }
-
-      .modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(2, 6, 23, 0.75);
-        backdrop-filter: blur(6px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        z-index: 999;
-      }
-
-      .modal[hidden] {
-        display: none;
-      }
-
-      .modal-box {
-        background: #f9fbff;
-        border-radius: 24px;
-        width: min(640px, 100%);
-        padding: clamp(1.5rem, 3vw, 2.5rem);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 20px 90px rgba(15, 23, 42, 0.35);
-        position: relative;
-      }
-
-      .modal-close {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        border: none;
-        background: transparent;
-        font-size: 1.5rem;
-        cursor: pointer;
-        color: var(--muted);
-      }
-
-      .modal-meta {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin: 1rem 0 1.5rem;
-      }
-
-      .modal-meta strong {
-        font-size: 1.1rem;
-        color: var(--text);
-      }
-
-      .modal-meta span {
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        color: var(--muted);
-        letter-spacing: 0.08em;
-      }
-
-      .modal-meta small {
-        display: block;
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-
-      .modal-payload {
-        margin-bottom: 1rem;
-      }
-
-      .modal-payload h3 {
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-    <div class="page">
-      <header>
-        <p class="method-chip">IT12A - Tom Werth - Lukas Thiergärtner</p>
-        <h1>REST-Demo: Fetch, CRUD und Http-verbs</h1>
-        <p>
-            Eine interaktive Demo, die die Grundlagen von RESTful APIs und HTTP-Verben (GET, POST, PUT, DELETE)
-            veranschaulicht.
+  <body class="min-h-screen bg-gradient-to-br from-[#e0e7ff] via-white to-[#ffe4f3] text-slate-900">
+    <div class="max-w-5xl mx-auto px-4 py-12 space-y-8">
+      <header class="rounded-3xl bg-white/85 backdrop-blur shadow-[0_30px_80px_rgba(15,23,42,0.18)] p-8 space-y-5 border border-white/60">
+        <p class="inline-flex items-center rounded-full bg-indigo-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
+          REST • JSON • Express
         </p>
+        <h1 class="text-3xl font-semibold text-slate-900">REST-Demo: Node.js + Fetch</h1>
+        <p class="text-slate-600 text-base leading-relaxed">
+          Interagiere mit einer schlanken REST-API, beobachte Statuscodes und Payloads live und nutze das Modal, um jede
+          Anfrage technisch zu erläutern.
+        </p>
+        <ul class="grid gap-4 md:grid-cols-3 text-sm text-slate-600">
+          <li class="flex gap-2">
+            <span class="font-semibold text-slate-800">Backend:</span>
+            Node.js/Express mit In-Memory-Daten, vier CRUD-Endpunkte und klare HTTP-Methoden zum Nachvollziehen der Pipeline.
+          </li>
+          <li class="flex gap-2">
+            <span class="font-semibold text-slate-800">Frontend:</span>
+            HTML + Fetch, jede Benutzeraktion erzeugt genau einen Request – ideal, um Header, Body und Status zu zeigen.
+          </li>
+          <li class="flex gap-2">
+            <span class="font-semibold text-slate-800">Storyline:</span>
+            Erst GET zum Synchronisieren, dann POST für Inserts, PUT/DELETE für Mutationen, abschließend geplante 4xx/5xx-Szenarien.
+          </li>
+        </ul>
       </header>
 
-      <main>
-        <section>
-          <h2>Aktionen (HTTP-Verbs)</h2>
-          <div class="card-grid">
-            <article class="info-card">
-              <p class="tag">GET</p>
-              <h3>Lesen</h3>
-              <p>Ruft Ressourcen ab und zeigt typische Response-Strukturen mit Listen und Einzelobjekten.</p>
+      <main class="space-y-6">
+        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-5">
+          <h2 class="text-xl font-semibold text-slate-900">Aktionen als Kacheln</h2>
+          <div class="grid gap-4 md:grid-cols-3">
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">GET</p>
+              <h3 class="text-lg font-semibold text-slate-900">Lesen &amp; Synchronisieren</h3>
+              <p class="text-sm text-slate-600">Liest den aktuellen Zustand und zeigt JSON-Strukturen inklusive Header/Status.</p>
             </article>
-            <article class="info-card">
-              <p class="tag">POST</p>
-              <h3>Neu erstellen</h3>
-              <p>Erstellt neue Datensätze. Fokus auf JSON-Payload, Validierung und 201 Created Responses.</p>
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">POST</p>
+              <h3 class="text-lg font-semibold text-slate-900">Neue Artikel anlegen</h3>
+              <p class="text-sm text-slate-600">Erstellt Ressourcen mit JSON-Bodies – optimal, um Validierung zu demonstrieren.</p>
             </article>
-            <article class="info-card">
-              <p class="tag">PUT</p>
-              <h3>Bestehendes aktualisieren</h3>
-              <p>Aktualisiert Ressourcen per ID. Erklärt idempotente Updates, vollständige Payloads und 200 vs. 204 Antworten.</p>
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">PUT</p>
+              <h3 class="text-lg font-semibold text-slate-900">Bestehendes aktualisieren</h3>
+              <p class="text-sm text-slate-600">Zeigt Idempotenz, Payload-Anforderungen und Reaktionen auf fehlende Felder.</p>
             </article>
-            <article class="info-card">
-                <p class="tag">DELETE</p>
-                <h3>Löschen</h3>
-                <p>Entfernt Ressourcen per ID. Zeigt 204 No Content Antworten und behandelt nicht gefundene Ressourcen.</p>
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">DELETE</p>
+              <h3 class="text-lg font-semibold text-slate-900">Aufräumen</h3>
+              <p class="text-sm text-slate-600">Demonstriert Resource-URIs, Erfolgscodes und Antworten ohne Body.</p>
             </article>
-            <article class="info-card">
-              <p class="tag">4xx</p>
-              <h3>Fehler beim Client</h3>
-              <p>Client-Fehler (400/401/403/404) zeigen an das Ein fehlerhafter Request vorliegt (Client-seitig).</p>
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">4xx</p>
+              <h3 class="text-lg font-semibold text-slate-900">Client-Fehler</h3>
+              <p class="text-sm text-slate-600">Zeigt strukturierte JSON-Fehler bei Validierungs-, Auth- und Routingproblemen.</p>
             </article>
-            <article class="info-card">
-              <p class="tag">5xx</p>
-              <h3>Serverfehler</h3>
-                <p>Server-Fehler (500+) zeigen an, dass auf dem Server ein
+            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">5xx</p>
+              <h3 class="text-lg font-semibold text-slate-900">Server-Fehler</h3>
+              <p class="text-sm text-slate-600">Demonstriert 500/502/503 und den RFC-Status 418 für Edge-Cases.</p>
             </article>
           </div>
         </section>
 
-        <section>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem">
-            <h2>Live-Demo: GET /items</h2>
-            <button id="fetch-btn">GET /items</button>
-            <div id="status"></div>
-          </div>
-        </section>
-
-        <section>
-          <h2>Neuen Artikel erstellen (POST)</h2>
-          <p style="color: var(--muted)">
-            Füge neue Artikel hinzu.
+        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
+          <h2 class="text-xl font-semibold text-slate-900">Live-Demo: GET /items</h2>
+          <p class="text-sm text-slate-600">
+            Einstieg in jede Demo: GET ausführen, Modal öffnen, HTTP-Status und JSON-Body erläutern, danach Mutationen durchspielen.
           </p>
-          <form id="add-form" class="layout-grid">
-            <label>
+          <button id="fetch-btn" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition">
+            GET /items
+          </button>
+          <div id="status" class="min-h-[1.5rem] text-sm font-semibold text-emerald-600"></div>
+        </section>
+
+        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-4">
+          <h2 class="text-xl font-semibold text-slate-900">Neuen Artikel erstellen (POST)</h2>
+          <p class="text-sm text-slate-600">Zeigt JSON-Body, Validierung und 201-Response – ideal für Erstellungsvorgänge.</p>
+          <form id="add-form" class="grid gap-4 md:grid-cols-3">
+            <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
               Name
-              <input id="add-name" type="text" placeholder="z. B. Monitor" required />
+              <input id="add-name" type="text" placeholder="z. B. Monitor" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
             </label>
-            <label>
+            <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
               Anzahl
-              <input id="add-quantity" type="number" placeholder="z. B. 2" required />
+              <input id="add-quantity" type="number" placeholder="z. B. 2" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
             </label>
-            <button type="submit">POST</button>
+            <div class="flex items-end">
+              <button type="submit" class="w-full rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600 transition">
+                POST
+              </button>
+            </div>
           </form>
         </section>
 
-          <section>
-              <h2>Wie funktioniert fetch()?</h2>
-              <p style="color: var(--muted)">
-                  <code>fetch()</code> ist ein Browser-API, um HTTP-Anfragen zu senden.
-                  Es gibt immer ein Promise mit einer <code>Response</code> zurück – auch
-                  bei Fehlern wie 404. Der Antwort-Body muss meist mit
-                  <code>response.json()</code> ausgelesen werden.
-              </p>
-              <pre><code>
-            fetch('/items')
-              .then(res => res.json())
-              .then(data => console.log(data));
-              </code></pre>
-          </section>
-
-        <section>
-          <h2>Artikel-Liste (PUT & DELETE)</h2>
-          <p style="color: var(--muted)">
-            Aktualisiere oder lösche bestehende Artikel.
+        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
+          <h2 class="text-xl font-semibold text-slate-900">Artikel-Liste (PUT &amp; DELETE)</h2>
+          <p class="text-sm text-slate-600">
+            Jede Karte spiegelt PUT/DELETE wider. Erkläre URI-Design, Payload-Anforderungen und wie Konflikte behandelt werden.
           </p>
-          <div id="items" class="items-list"></div>
+          <div id="items" class="space-y-3"></div>
         </section>
 
-        <section>
-          <h2>Statuscodes</h2>
-          <p style="color: var(--muted)">
-            Http statuscodes zeigen den zustand einer anfrage an.
+        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
+          <h2 class="text-xl font-semibold text-slate-900">Statuscodes live ausprobieren</h2>
+          <p class="text-sm text-slate-600">
+            Teste Auth- und Berechtigungsfehler (401/403), nicht gefundene Ressourcen, verschiedene 5xx-Szenarien sowie den RFC-Status 418.
           </p>
-          <div class="status-buttons">
-            <button type="button" class="btn-warning" id="trigger-400">400 BAD REQUEST</button>
-            <button type="button" class="btn-secondary" id="trigger-401">401 UNAUTHORIZED</button>
-            <button type="button" class="btn-secondary" id="trigger-403">403 FORBIDDEN</button>
-            <button type="button" class="btn-secondary" id="trigger-404">404 NOT FOUND</button>
-            <button type="button" class="btn-danger" id="trigger-500">500 SERVER ERROR</button>
-            <button type="button" class="btn-danger" id="trigger-502">502 BAD GATEWAY</button>
-            <button type="button" class="btn-danger" id="trigger-503">503 SERVICE UNAVAILABLE</button>
-            <button type="button" class="btn-teapot" id="trigger-418">418 I'M A TEAPOT</button>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button type="button" class="rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-amber-600" id="trigger-400">
+              400 Bad Request
+            </button>
+            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-401">
+              401 Unauthorized
+            </button>
+            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-403">
+              403 Forbidden
+            </button>
+            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-404">
+              404 Not Found
+            </button>
+            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-500">
+              500 Server Error
+            </button>
+            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-502">
+              502 Bad Gateway
+            </button>
+            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-503">
+              503 Service Unavailable
+            </button>
+            <button type="button" class="rounded-full bg-gradient-to-r from-pink-400 via-yellow-300 to-orange-400 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-900 shadow hover:from-pink-500 hover:via-yellow-300 hover:to-orange-400" id="trigger-418">
+              418 I'm a Teapot
+            </button>
           </div>
         </section>
       </main>
     </div>
 
-    <div class="modal" id="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-title">
-      <div class="modal-box">
-        <button class="modal-close" id="modal-close" aria-label="Modal schließen">×</button>
-        <p class="method-chip" id="modal-method">GET</p>
-        <h2 id="modal-title">Aktion</h2>
-        <p id="modal-description" style="color: var(--muted)"></p>
-        <div class="modal-meta">
-          <div>
-            <span>Statuscode</span>
-            <strong id="modal-status">200 OK</strong>
-            <small id="modal-status-info">Alles hat funktioniert</small>
+    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 px-4 py-8 backdrop-blur" id="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-title">
+      <div class="relative w-full max-w-3xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl space-y-6">
+        <button class="absolute right-4 top-4 text-2xl text-slate-400 hover:text-slate-600" id="modal-close" aria-label="Modal schließen">×</button>
+        <p id="modal-method" class="inline-flex rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">GET</p>
+        <div class="space-y-2">
+          <h2 id="modal-title" class="text-2xl font-semibold text-slate-900">Aktion</h2>
+          <p id="modal-description" class="text-sm text-slate-600"></p>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 p-4">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Statuscode</span>
+            <strong id="modal-status" class="mt-1 block text-lg text-slate-900">200 OK</strong>
+            <small id="modal-status-info" class="text-xs text-slate-500">Alles hat funktioniert</small>
           </div>
-          <div>
-            <span>Zeitstempel</span>
-            <strong id="modal-time">–</strong>
-            <small>Lokale Ausführungszeit</small>
+          <div class="rounded-2xl border border-slate-200 p-4">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Zeitstempel</span>
+            <strong id="modal-time" class="mt-1 block text-lg text-slate-900">–</strong>
+            <small class="text-xs text-slate-500">Lokale Ausführungszeit</small>
           </div>
-          <div>
-            <span>Datenvolumen</span>
-            <strong id="modal-size">Req 0 B · Res 0 B</strong>
-            <small>JSON-Bytes der Payloads</small>
+          <div class="rounded-2xl border border-slate-200 p-4">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Datenvolumen</span>
+            <strong id="modal-size" class="mt-1 block text-lg text-slate-900">Req 0 B · Res 0 B</strong>
+            <small class="text-xs text-slate-500">JSON-Bytes von Request/Response</small>
           </div>
         </div>
-        <div class="modal-payload">
-          <h3>Request-Body</h3>
-          <pre id="modal-request">—</pre>
-        </div>
-        <div class="modal-payload">
-          <h3>Response</h3>
-          <pre id="modal-response">—</pre>
+        <div class="space-y-3">
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Request-Body</h3>
+            <pre id="modal-request" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
+          </div>
+          <div>
+            <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Response</h3>
+            <pre id="modal-response" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
+          </div>
         </div>
       </div>
     </div>
