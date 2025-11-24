@@ -1,5 +1,6 @@
 .idea
 backend/node_modules
+frontend/node_modules
 package-lock.json
 .DS_Store
 dist
