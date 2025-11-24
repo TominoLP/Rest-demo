@@ -17,10 +17,11 @@ const modalTitle = document.getElementById('modal-title');
 const modalDesc = document.getElementById('modal-description');
 const modalStatus = document.getElementById('modal-status');
 const modalStatusInfo = document.getElementById('modal-status-info');
-const modalTime = document.getElementById('modal-time');
 const modalSize = document.getElementById('modal-size');
 const modalRequest = document.getElementById('modal-request');
 const modalResponse = document.getElementById('modal-response');
+const modalHeaders = document.getElementById('modal-headers');
+const textEncoder = new TextEncoder();
 const trigger400Btn = document.getElementById('trigger-400');
 const trigger401Btn = document.getElementById('trigger-401');
 const trigger403Btn = document.getElementById('trigger-403');
@@ -29,7 +30,19 @@ const trigger500Btn = document.getElementById('trigger-500');
 const trigger502Btn = document.getElementById('trigger-502');
 const trigger503Btn = document.getElementById('trigger-503');
 const trigger418Btn = document.getElementById('trigger-418');
-const textEncoder = new TextEncoder();
+const headersToArray = (headers) => {
+  if (!headers) return [];
+  if (headers instanceof Headers) {
+    return Array.from(headers.entries());
+  }
+  if (Array.isArray(headers)) {
+    return headers;
+  }
+  if (typeof headers === 'object') {
+    return Object.entries(headers);
+  }
+  return [];
+};
 
 const showStatus = (message, isError = false) => {
     statusEl.textContent = message;
@@ -50,8 +63,16 @@ const serializePayload = (payload) => {
 };
 
 const formatPayload = (payload) => {
-    const serialized = serializePayload(payload);
-    return serialized === '' ? '—' : serialized;
+  const serialized = serializePayload(payload);
+  return serialized === '' ? '—' : serialized;
+};
+
+const formatHeadersBlock = (headers) => {
+  const entries = headersToArray(headers);
+  if (!entries.length) {
+    return '—';
+  }
+  return entries.map(([key, value]) => `${key}: ${value}`).join('\n');
 };
 
 const payloadBytes = (payload) => {
@@ -97,22 +118,22 @@ const closeModal = () => {
 };
 
 const openModal = ({
-                       method,
-                       status,
-                       statusText,
-                       title,
-                       description,
-                       requestBody,
-                       responseBody,
-                       isError = false,
-                       timestamp = Date.now(),
-                   }) => {
-    modalMethod.textContent = method || '-';
-    modalTitle.textContent = title || 'Aktion';
-    modalDesc.textContent = description || '';
+  method,
+  status,
+  statusText,
+  title,
+  description,
+  requestBody,
+  responseBody,
+  headers,
+  isError = false,
+}) => {
+  modalMethod.textContent = method || '-';
+  modalTitle.textContent = title || 'Aktion';
+  modalDesc.textContent = description || '';
     modalStatus.textContent = status ? `${status} ${statusText || ''}`.trim() : 'unbekannt';
     modalStatusInfo.textContent = explainStatus(status, isError);
-    modalTime.textContent = new Date(timestamp).toLocaleString();
+  modalHeaders.textContent = formatHeadersBlock(headers);
   const requestText = formatPayload(requestBody);
   const responseText = formatPayload(responseBody);
   modalRequest.textContent = requestText;
@@ -138,21 +159,23 @@ document.addEventListener('keydown', (event) => {
 });
 
 const fetchItems = async ({ withModal = false } = {}) => {
-    try {
-        const res = await fetch(itemsEndpoint);
-        if (!res.ok) {
-            const errorBody = await res.json().catch(() => ({}));
-            const err = new Error(errorBody.error || `Artikel konnten nicht geladen werden (${res.status})`);
-            err.meta = {
-                method: 'GET',
-                url: itemsEndpoint,
-                status: res.status,
-                statusText: res.statusText,
-                responseBody: errorBody,
-            };
-            throw err;
-        }
-        const { items = [] } = await res.json();
+  try {
+    const res = await fetch(itemsEndpoint);
+    const responseHeaders = headersToArray(res.headers);
+    if (!res.ok) {
+      const errorBody = await res.json().catch(() => ({}));
+      const err = new Error(errorBody.error || `Artikel konnten nicht geladen werden (${res.status})`);
+      err.meta = {
+        method: 'GET',
+        url: itemsEndpoint,
+        status: res.status,
+        statusText: res.statusText,
+        responseBody: errorBody,
+        headers: responseHeaders,
+      };
+      throw err;
+    }
+    const { items = [] } = await res.json();
         renderItems(items);
         showStatus('Artikel geladen');
         if (withModal) {
@@ -160,64 +183,69 @@ const fetchItems = async ({ withModal = false } = {}) => {
                 method: 'GET',
                 url: itemsEndpoint,
                 status: res.status,
-                statusText: res.statusText,
-                title: 'GET /items',
-                description: 'Alle Artikel wurden erfolgreich aus dem Speicher geladen.',
-                responseBody: items,
-            });
-        }
-    } catch (error) {
+        statusText: res.statusText,
+        title: 'GET /items',
+        description: 'Alle Artikel wurden erfolgreich aus dem Speicher geladen.',
+        responseBody: items,
+        headers: responseHeaders,
+      });
+    }
+  } catch (error) {
         showStatus(error.message, true);
         if (withModal || error.meta) {
             openModal({
                 method: error.meta?.method || 'GET',
                 url: error.meta?.url || itemsEndpoint,
                 status: error.meta?.status,
-                statusText: error.meta?.statusText,
-                title: 'Fehler bei GET /items',
-                description: error.message,
-                responseBody: error.meta?.responseBody,
-                isError: true,
-            });
+        statusText: error.meta?.statusText,
+        title: 'Fehler bei GET /items',
+        description: error.message,
+        responseBody: error.meta?.responseBody,
+        headers: error.meta?.headers || [],
+        isError: true,
+      });
         }
     }
 };
 
 const addItem = async (name, quantity) => {
-    try {
-        const res = await fetch(itemsEndpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, quantity }),
-        });
-        if (!res.ok) {
-            const data = await res.json().catch(() => ({}));
-            const err = new Error(data.error || 'Artikel konnte nicht angelegt werden');
-            err.meta = {
-                method: 'POST',
-                url: itemsEndpoint,
-                status: res.status,
-                statusText: res.statusText,
-                requestBody: { name, quantity },
-                responseBody: data,
-            };
-            throw err;
-        }
-        const payload = await res.json();
+  try {
+    const res = await fetch(itemsEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, quantity }),
+    });
+    const responseHeaders = headersToArray(res.headers);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Artikel konnte nicht angelegt werden');
+      err.meta = {
+        method: 'POST',
+        url: itemsEndpoint,
+        status: res.status,
+        statusText: res.statusText,
+        requestBody: { name, quantity },
+        responseBody: data,
+        headers: responseHeaders,
+      };
+      throw err;
+    }
+    const payload = await res.json();
         showStatus('Artikel hinzugefügt');
         addForm.reset();
         openModal({
             method: 'POST',
             url: itemsEndpoint,
             status: res.status,
-            statusText: res.statusText,
-            title: 'POST /items',
-            description: 'Neuer Artikel wurde gespeichert.',
-            requestBody: { name, quantity },
-            responseBody: payload,
-        });
+      statusText: res.statusText,
+      title: 'POST /items',
+      description: 'Neuer Artikel wurde gespeichert.',
+      requestBody: { name, quantity },
+      responseBody: payload,
+      headers: responseHeaders,
+    });
         fetchItems();
     } catch (error) {
         showStatus(error.message, true);
@@ -225,39 +253,42 @@ const addItem = async (name, quantity) => {
             method: error.meta?.method || 'POST',
             url: error.meta?.url || itemsEndpoint,
             status: error.meta?.status,
-            statusText: error.meta?.statusText,
-            title: 'Fehler bei POST /items',
-            description: error.message,
-            requestBody: error.meta?.requestBody,
-            responseBody: error.meta?.responseBody,
-            isError: true,
-        });
+      statusText: error.meta?.statusText,
+      title: 'Fehler bei POST /items',
+      description: error.message,
+      requestBody: error.meta?.requestBody,
+      responseBody: error.meta?.responseBody,
+      headers: error.meta?.headers || [],
+      isError: true,
+    });
     }
 };
 
 const updateItem = async (id, name, quantity) => {
-    try {
-        const endpoint = `${apiRoot}/items/${id}`;
-        const res = await fetch(endpoint, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, quantity }),
-        });
-        if (!res.ok) {
-            const data = await res.json().catch(() => ({}));
-            const err = new Error(data.error || 'Artikel konnte nicht aktualisiert werden');
-            err.meta = {
-                method: 'PUT',
-                url: endpoint,
-                status: res.status,
-                statusText: res.statusText,
-                requestBody: { name, quantity },
-                responseBody: data,
-            };
-            throw err;
-        }
+  try {
+    const endpoint = `${apiRoot}/items/${id}`;
+    const res = await fetch(endpoint, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, quantity }),
+    });
+    const responseHeaders = headersToArray(res.headers);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Artikel konnte nicht aktualisiert werden');
+      err.meta = {
+        method: 'PUT',
+        url: endpoint,
+        status: res.status,
+        statusText: res.statusText,
+        requestBody: { name, quantity },
+        responseBody: data,
+        headers: responseHeaders,
+      };
+      throw err;
+    }
         const payload = await res.json();
         showStatus('Artikel aktualisiert');
         openModal({
@@ -265,11 +296,12 @@ const updateItem = async (id, name, quantity) => {
             url: endpoint,
             status: res.status,
             statusText: res.statusText,
-            title: `PUT /items/${id}`,
-            description: 'Artikel wurde erfolgreich angepasst.',
-            requestBody: { name, quantity },
-            responseBody: payload,
-        });
+      title: `PUT /items/${id}`,
+      description: 'Artikel wurde erfolgreich angepasst.',
+      requestBody: { name, quantity },
+      responseBody: payload,
+      headers: responseHeaders,
+    });
         fetchItems();
     } catch (error) {
         showStatus(error.message, true);
@@ -278,33 +310,36 @@ const updateItem = async (id, name, quantity) => {
             url: error.meta?.url || `${apiRoot}/items/${id}`,
             status: error.meta?.status,
             statusText: error.meta?.statusText,
-            title: `Fehler bei PUT /items/${id}`,
-            description: error.message,
-            requestBody: error.meta?.requestBody,
-            responseBody: error.meta?.responseBody,
-            isError: true,
-        });
+      title: `Fehler bei PUT /items/${id}`,
+      description: error.message,
+      requestBody: error.meta?.requestBody,
+      responseBody: error.meta?.responseBody,
+      headers: error.meta?.headers || [],
+      isError: true,
+    });
     }
 };
 
 const deleteItem = async (id) => {
-    try {
-        const endpoint = `${apiRoot}/items/${id}`;
-        const res = await fetch(endpoint, {
-            method: 'DELETE',
-        });
-        if (!res.ok) {
-            const data = await res.json().catch(() => ({}));
-            const err = new Error(data.error || 'Artikel konnte nicht gelöscht werden');
-            err.meta = {
-                method: 'DELETE',
-                url: endpoint,
-                status: res.status,
-                statusText: res.statusText,
-                responseBody: data,
-            };
-            throw err;
-        }
+  try {
+    const endpoint = `${apiRoot}/items/${id}`;
+    const res = await fetch(endpoint, {
+      method: 'DELETE',
+    });
+    const responseHeaders = headersToArray(res.headers);
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const err = new Error(data.error || 'Artikel konnte nicht gelöscht werden');
+      err.meta = {
+        method: 'DELETE',
+        url: endpoint,
+        status: res.status,
+        statusText: res.statusText,
+        responseBody: data,
+        headers: responseHeaders,
+      };
+      throw err;
+    }
         const payload = await res.json();
         showStatus('Artikel gelöscht');
         openModal({
@@ -312,10 +347,11 @@ const deleteItem = async (id) => {
             url: endpoint,
             status: res.status,
             statusText: res.statusText,
-            title: `DELETE /items/${id}`,
-            description: 'Artikel wurde entfernt.',
-            responseBody: payload,
-        });
+      title: `DELETE /items/${id}`,
+      description: 'Artikel wurde entfernt.',
+      responseBody: payload,
+      headers: responseHeaders,
+    });
         fetchItems();
     } catch (error) {
         showStatus(error.message, true);
@@ -323,12 +359,13 @@ const deleteItem = async (id) => {
             method: error.meta?.method || 'DELETE',
             url: error.meta?.url || `${apiRoot}/items/${id}`,
             status: error.meta?.status,
-            statusText: error.meta?.statusText,
-            title: `Fehler bei DELETE /items/${id}`,
-            description: error.message,
-            responseBody: error.meta?.responseBody,
-            isError: true,
-        });
+      statusText: error.meta?.statusText,
+      title: `Fehler bei DELETE /items/${id}`,
+      description: error.message,
+      responseBody: error.meta?.responseBody,
+      headers: error.meta?.headers || [],
+      isError: true,
+    });
     }
 };
 
@@ -415,338 +452,370 @@ addForm.addEventListener('submit', (event) => {
 });
 
 const triggerBadRequest = async () => {
-    const invalidBody = { name: '', quantity: null };
-    try {
-        const res = await fetch(itemsEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(invalidBody),
-        });
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: Server hat die 400-Demo akzeptiert.');
-            openModal({
-                method: 'POST',
-                url: itemsEndpoint,
-                status: res.status,
-                statusText: res.statusText,
-                title: 'POST /items (Demo)',
-                description: 'Diese Anfrage sollte eigentlich scheitern, zeigte aber eine erfolgreiche Antwort.',
-                requestBody: invalidBody,
-                responseBody: payload,
-            });
-            return;
-        }
-        showStatus('400-Demo ausgelöst');
-        openModal({
-            method: 'POST',
-            url: itemsEndpoint,
-            status: res.status,
-            statusText: res.statusText,
-            title: '400 BAD REQUEST',
-            description: 'Der Server verwirft Payloads, die das erwartete Schema verletzen (HTTP 400).',
-            requestBody: invalidBody,
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+  const invalidBody = { name: '', quantity: null };
+  try {
+    const res = await fetch(itemsEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(invalidBody),
+    });
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: Server hat die 400-Demo akzeptiert.');
+      openModal({
+        method: 'POST',
+        url: itemsEndpoint,
+        status: res.status,
+        statusText: res.statusText,
+        title: 'POST /items (Demo)',
+        description: 'Diese Anfrage sollte eigentlich scheitern, zeigte aber eine erfolgreiche Antwort.',
+        requestBody: invalidBody,
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
+    showStatus('400-Demo ausgelöst');
+    openModal({
+      method: 'POST',
+      url: itemsEndpoint,
+      status: res.status,
+      statusText: res.statusText,
+      title: '400 BAD REQUEST',
+      description: 'Der Server verwirft Payloads, die das erwartete Schema verletzen (HTTP 400).',
+      requestBody: invalidBody,
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'POST',
             url: itemsEndpoint,
-            title: 'Fehler bei 400-Demo',
-            description: error.message,
-            requestBody: invalidBody,
-            isError: true,
-        });
+      title: 'Fehler bei 400-Demo',
+      description: error.message,
+      requestBody: invalidBody,
+      headers: [],
+      isError: true,
+    });
     }
 };
 
 const triggerUnauthorized = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=unauthorized`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 401-Demo lieferte Erfolg.');
-            openModal({
-                method: 'GET',
-                url: endpoint,
-                status: res.status,
-                statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Demo sollte einen 401 liefern, hat aber geklappt.',
-                responseBody: payload,
-            });
-            return;
-        }
-        showStatus('401-Demo ausgelöst');
-        openModal({
-            method: 'GET',
-            url: endpoint,
-            status: res.status,
-            statusText: res.statusText,
-            title: '401 UNAUTHORIZED',
-            description: 'Die Ressource fordert eine gültige Client-Authentifizierung (HTTP 401).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+  const endpoint = `${itemsEndpoint}?simulate=unauthorized`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 401-Demo lieferte Erfolg.');
+      openModal({
+        method: 'GET',
+        url: endpoint,
+        status: res.status,
+        statusText: res.statusText,
+        title: 'GET /items (Demo)',
+        description: 'Diese Demo sollte einen 401 liefern, hat aber geklappt.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
+    showStatus('401-Demo ausgelöst');
+    openModal({
+      method: 'GET',
+      url: endpoint,
+      status: res.status,
+      statusText: res.statusText,
+      title: '401 UNAUTHORIZED',
+      description: 'Die Ressource fordert eine gültige Client-Authentifizierung (HTTP 401).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'GET',
             url: endpoint,
-            title: 'Fehler bei 401-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 401-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerForbidden = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=forbidden`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 403-Demo lieferte Erfolg.');
-            openModal({
-                method: 'GET',
-                url: endpoint,
-                status: res.status,
-                statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Demo sollte einen 403 liefern, hat aber geklappt.',
-                responseBody: payload,
-            });
-            return;
-        }
-        showStatus('403-Demo ausgelöst');
-        openModal({
-            method: 'GET',
-            url: endpoint,
-            status: res.status,
-            statusText: res.statusText,
-            title: '403 FORBIDDEN',
-            description: 'Die Berechtigungsprüfung verweigert den Zugriff trotz Authentifizierung (HTTP 403).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+  const endpoint = `${itemsEndpoint}?simulate=forbidden`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 403-Demo lieferte Erfolg.');
+      openModal({
+        method: 'GET',
+        url: endpoint,
+        status: res.status,
+        statusText: res.statusText,
+        title: 'GET /items (Demo)',
+        description: 'Diese Demo sollte einen 403 liefern, hat aber geklappt.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
+    showStatus('403-Demo ausgelöst');
+    openModal({
+      method: 'GET',
+      url: endpoint,
+      status: res.status,
+      statusText: res.statusText,
+      title: '403 FORBIDDEN',
+      description: 'Die Berechtigungsprüfung verweigert den Zugriff trotz Authentifizierung (HTTP 403).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'GET',
             url: endpoint,
-            title: 'Fehler bei 403-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 403-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerNotFound = async () => {
-    const endpoint = `${apiRoot}/items/999999`;
-    try {
-        const res = await fetch(endpoint, { method: 'DELETE' });
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 404-Demo lieferte Erfolg.');
+  const endpoint = `${apiRoot}/items/999999`;
+  try {
+    const res = await fetch(endpoint, { method: 'DELETE' });
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 404-Demo lieferte Erfolg.');
             openModal({
                 method: 'DELETE',
                 url: endpoint,
                 status: res.status,
                 statusText: res.statusText,
-                title: 'DELETE (Demo)',
-                description: 'Die Demo wollte ein 404 zeigen, stattdessen kam eine erfolgreiche Antwort.',
-                responseBody: payload,
-            });
-            return;
-        }
+        title: 'DELETE (Demo)',
+        description: 'Die Demo wollte ein 404 zeigen, stattdessen kam eine erfolgreiche Antwort.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
         showStatus('404-Demo ausgelöst');
         openModal({
             method: 'DELETE',
             url: endpoint,
-            status: res.status,
-            statusText: res.statusText,
-            title: '404 NOT FOUND',
-            description: 'Die adressierte Ressource existiert unter dieser URI nicht (HTTP 404).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+      status: res.status,
+      statusText: res.statusText,
+      title: '404 NOT FOUND',
+      description: 'Die adressierte Ressource existiert unter dieser URI nicht (HTTP 404).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'DELETE',
             url: endpoint,
-            title: 'Fehler bei 404-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 404-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerServerError = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=server-error`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 500-Demo lieferte Erfolg.');
+  const endpoint = `${itemsEndpoint}?simulate=server-error`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 500-Demo lieferte Erfolg.');
             openModal({
                 method: 'GET',
                 url: endpoint,
                 status: res.status,
                 statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Anfrage sollte fehlschlagen, lieferte aber einen Erfolg.',
-                responseBody: payload,
-            });
-            return;
-        }
+        title: 'GET /items (Demo)',
+        description: 'Diese Anfrage sollte fehlschlagen, lieferte aber einen Erfolg.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
         showStatus('500-Demo ausgelöst');
         openModal({
             method: 'GET',
             url: endpoint,
             status: res.status,
-            statusText: res.statusText,
-            title: '500 INTERNAL SERVER ERROR',
-            description: 'Das Backend erzeugt absichtlich eine ungefangene Ausnahme (HTTP 500).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+      statusText: res.statusText,
+      title: '500 INTERNAL SERVER ERROR',
+      description: 'Das Backend erzeugt absichtlich eine ungefangene Ausnahme (HTTP 500).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'GET',
             url: endpoint,
-            title: 'Fehler bei 500-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 500-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerBadGateway = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=bad-gateway`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 502-Demo lieferte Erfolg.');
+  const endpoint = `${itemsEndpoint}?simulate=bad-gateway`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 502-Demo lieferte Erfolg.');
             openModal({
                 method: 'GET',
                 url: endpoint,
                 status: res.status,
                 statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Demo sollte einen 502 liefern, hat aber geklappt.',
-                responseBody: payload,
-            });
-            return;
-        }
+        title: 'GET /items (Demo)',
+        description: 'Diese Demo sollte einen 502 liefern, hat aber geklappt.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
         showStatus('502-Demo ausgelöst');
         openModal({
             method: 'GET',
             url: endpoint,
             status: res.status,
-            statusText: res.statusText,
-            title: '502 BAD GATEWAY',
-            description: 'Proxy oder API-Gateway erhielt eine ungültige Antwort vom Upstream-Service (HTTP 502).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+      statusText: res.statusText,
+      title: '502 BAD GATEWAY',
+      description: 'Proxy oder API-Gateway erhielt eine ungültige Antwort vom Upstream-Service (HTTP 502).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'GET',
             url: endpoint,
-            title: 'Fehler bei 502-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 502-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerServiceUnavailable = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=service-unavailable`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 503-Demo lieferte Erfolg.');
+  const endpoint = `${itemsEndpoint}?simulate=service-unavailable`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 503-Demo lieferte Erfolg.');
             openModal({
                 method: 'GET',
                 url: endpoint,
                 status: res.status,
                 statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Demo sollte einen 503 liefern, hat aber geklappt.',
-                responseBody: payload,
-            });
-            return;
-        }
+        title: 'GET /items (Demo)',
+        description: 'Diese Demo sollte einen 503 liefern, hat aber geklappt.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
+    }
         showStatus('503-Demo ausgelöst');
         openModal({
             method: 'GET',
             url: endpoint,
             status: res.status,
-            statusText: res.statusText,
-            title: '503 SERVICE UNAVAILABLE',
-            description: 'Service signalisiert temporäre Nichtverfügbarkeit, z. B. Wartung oder Überlast (HTTP 503).',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
+      statusText: res.statusText,
+      title: '503 SERVICE UNAVAILABLE',
+      description: 'Service signalisiert temporäre Nichtverfügbarkeit, z. B. Wartung oder Überlast (HTTP 503).',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
         showStatus(error.message, true);
         openModal({
             method: 'GET',
             url: endpoint,
-            title: 'Fehler bei 503-Demo',
-            description: error.message,
-            isError: true,
-        });
-    }
+      title: 'Fehler bei 503-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 const triggerTeapot = async () => {
-    const endpoint = `${itemsEndpoint}?simulate=teapot`;
-    try {
-        const res = await fetch(endpoint);
-        const payload = await res.json().catch(() => ({}));
-        if (res.ok) {
-            showStatus('Unerwartet: 418-Demo lieferte Erfolg.');
-            openModal({
-                method: 'GET',
-                url: endpoint,
-                status: res.status,
-                statusText: res.statusText,
-                title: 'GET /items (Demo)',
-                description: 'Diese Demo sollte einen Teapot-Status liefern, hat aber geklappt.',
-                responseBody: payload,
-            });
-            return;
-        }
-        showStatus("418-Demo ausgelöst – Zeit für 'I'm a teapot'!");
-        openModal({
-            method: 'GET',
-            url: endpoint,
-            status: res.status,
-            statusText: res.statusText,
-            title: "418 I'M A TEAPOT",
-            description: 'RFC‑2324 Status – demonstriert Clients den Umgang mit nicht standardisierten Codes.',
-            responseBody: payload,
-            isError: true,
-        });
-    } catch (error) {
-        showStatus(error.message, true);
-        openModal({
-            method: 'GET',
-            url: endpoint,
-            title: 'Fehler bei 418-Demo',
-            description: error.message,
-            isError: true,
-        });
+  const endpoint = `${itemsEndpoint}?simulate=teapot`;
+  try {
+    const res = await fetch(endpoint);
+    const responseHeaders = headersToArray(res.headers);
+    const payload = await res.json().catch(() => ({}));
+    if (res.ok) {
+      showStatus('Unerwartet: 418-Demo lieferte Erfolg.');
+      openModal({
+        method: 'GET',
+        url: endpoint,
+        status: res.status,
+        statusText: res.statusText,
+        title: 'GET /items (Demo)',
+        description: 'Diese Demo sollte einen Teapot-Status liefern, hat aber geklappt.',
+        responseBody: payload,
+        headers: responseHeaders,
+      });
+      return;
     }
+    showStatus("418-Demo ausgelöst – Zeit für 'I'm a teapot'!");
+    openModal({
+      method: 'GET',
+      url: endpoint,
+      status: res.status,
+      statusText: res.statusText,
+      title: "418 I'M A TEAPOT",
+      description: 'RFC‑2324 Status – demonstriert Clients den Umgang mit nicht standardisierten Codes.',
+      responseBody: payload,
+      headers: responseHeaders,
+      isError: true,
+    });
+  } catch (error) {
+    showStatus(error.message, true);
+    openModal({
+      method: 'GET',
+      url: endpoint,
+      title: 'Fehler bei 418-Demo',
+      description: error.message,
+      headers: [],
+      isError: true,
+    });
+  }
 };
 
 trigger400Btn.addEventListener('click', triggerBadRequest);
