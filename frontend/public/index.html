@@ -1,187 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>REST Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="min-h-screen bg-gradient-to-br from-[#e0e7ff] via-white to-[#ffe4f3] text-slate-900">
-    <div class="max-w-5xl mx-auto px-4 py-12 space-y-8">
-      <header class="rounded-3xl bg-white/85 backdrop-blur shadow-[0_30px_80px_rgba(15,23,42,0.18)] p-8 space-y-5 border border-white/60">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#e0e7ff] via-white to-[#ffe4f3] text-slate-900">
+<div class="max-w-5xl mx-auto px-4 py-12 space-y-8">
+    <header class="rounded-3xl bg-white/85 backdrop-blur border border-white/60 shadow-[0_30px_80px_rgba(15,23,42,0.18)] p-8 space-y-5">
         <p class="inline-flex items-center rounded-full bg-indigo-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
-          REST • JSON • Express
+            IT12A - Tom Werth - Lukas Thiergärtner
         </p>
-        <h1 class="text-3xl font-semibold text-slate-900">REST-Demo: Node.js + Fetch</h1>
+        <h1 class="text-3xl font-semibold text-slate-900">REST-Demo: Fetch, CRUD und Http-verbs</h1>
         <p class="text-slate-600 text-base leading-relaxed">
-          Interagiere mit einer schlanken REST-API, beobachte Statuscodes und Payloads live und nutze das Modal, um jede
-          Anfrage technisch zu erläutern.
+            Eine interaktive Demo, die die Grundlagen von RESTful APIs und HTTP-Verben (GET, POST, PUT, DELETE) veranschaulicht.
         </p>
-        <ul class="grid gap-4 md:grid-cols-3 text-sm text-slate-600">
-          <li class="flex gap-2">
-            <span class="font-semibold text-slate-800">Backend:</span>
-            Node.js/Express mit In-Memory-Daten, vier CRUD-Endpunkte und klare HTTP-Methoden zum Nachvollziehen der Pipeline.
-          </li>
-          <li class="flex gap-2">
-            <span class="font-semibold text-slate-800">Frontend:</span>
-            HTML + Fetch, jede Benutzeraktion erzeugt genau einen Request – ideal, um Header, Body und Status zu zeigen.
-          </li>
-          <li class="flex gap-2">
-            <span class="font-semibold text-slate-800">Storyline:</span>
-            Erst GET zum Synchronisieren, dann POST für Inserts, PUT/DELETE für Mutationen, abschließend geplante 4xx/5xx-Szenarien.
-          </li>
-        </ul>
-      </header>
+    </header>
 
-      <main class="space-y-6">
-        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-5">
-          <h2 class="text-xl font-semibold text-slate-900">Aktionen als Kacheln</h2>
-          <div class="grid gap-4 md:grid-cols-3">
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">GET</p>
-              <h3 class="text-lg font-semibold text-slate-900">Lesen &amp; Synchronisieren</h3>
-              <p class="text-sm text-slate-600">Liest den aktuellen Zustand und zeigt JSON-Strukturen inklusive Header/Status.</p>
-            </article>
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">POST</p>
-              <h3 class="text-lg font-semibold text-slate-900">Neue Artikel anlegen</h3>
-              <p class="text-sm text-slate-600">Erstellt Ressourcen mit JSON-Bodies – optimal, um Validierung zu demonstrieren.</p>
-            </article>
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">PUT</p>
-              <h3 class="text-lg font-semibold text-slate-900">Bestehendes aktualisieren</h3>
-              <p class="text-sm text-slate-600">Zeigt Idempotenz, Payload-Anforderungen und Reaktionen auf fehlende Felder.</p>
-            </article>
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">DELETE</p>
-              <h3 class="text-lg font-semibold text-slate-900">Aufräumen</h3>
-              <p class="text-sm text-slate-600">Demonstriert Resource-URIs, Erfolgscodes und Antworten ohne Body.</p>
-            </article>
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">4xx</p>
-              <h3 class="text-lg font-semibold text-slate-900">Client-Fehler</h3>
-              <p class="text-sm text-slate-600">Zeigt strukturierte JSON-Fehler bei Validierungs-, Auth- und Routingproblemen.</p>
-            </article>
-            <article class="rounded-2xl border border-slate-200 bg-white/90 p-5 shadow-sm space-y-2">
-              <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">5xx</p>
-              <h3 class="text-lg font-semibold text-slate-900">Server-Fehler</h3>
-              <p class="text-sm text-slate-600">Demonstriert 500/502/503 und den RFC-Status 418 für Edge-Cases.</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
-          <h2 class="text-xl font-semibold text-slate-900">Live-Demo: GET /items</h2>
-          <p class="text-sm text-slate-600">
-            Einstieg in jede Demo: GET ausführen, Modal öffnen, HTTP-Status und JSON-Body erläutern, danach Mutationen durchspielen.
-          </p>
-          <button id="fetch-btn" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition">
-            GET /items
-          </button>
-          <div id="status" class="min-h-[1.5rem] text-sm font-semibold text-emerald-600"></div>
-        </section>
-
-        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-4">
-          <h2 class="text-xl font-semibold text-slate-900">Neuen Artikel erstellen (POST)</h2>
-          <p class="text-sm text-slate-600">Zeigt JSON-Body, Validierung und 201-Response – ideal für Erstellungsvorgänge.</p>
-          <form id="add-form" class="grid gap-4 md:grid-cols-3">
-            <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
-              Name
-              <input id="add-name" type="text" placeholder="z. B. Monitor" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
-            </label>
-            <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
-              Anzahl
-              <input id="add-quantity" type="number" placeholder="z. B. 2" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
-            </label>
-            <div class="flex items-end">
-              <button type="submit" class="w-full rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600 transition">
-                POST
-              </button>
+    <main class="space-y-6">
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-5">
+            <h2 class="text-xl font-semibold text-slate-900">Aktionen (HTTP-Verbs)</h2>
+            <div class="grid gap-4 md:grid-cols-3">
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">GET</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Lesen</h3>
+                    <p class="text-sm text-slate-600">Ruft Ressourcen ab und zeigt typische Response-Strukturen mit Listen und Einzelobjekten.</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">POST</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Neu erstellen</h3>
+                    <p class="text-sm text-slate-600">Erstellt neue Datensätze. Fokus auf JSON-Payload, Validierung und 201 Created Responses.</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">PUT</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Bestehendes aktualisieren</h3>
+                    <p class="text-sm text-slate-600">Aktualisiert Ressourcen per ID. Erklärt idempotente Updates, vollständige Payloads und 200 vs. 204 Antworten.</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">DELETE</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Löschen</h3>
+                    <p class="text-sm text-slate-600">Entfernt Ressourcen per ID. Zeigt 204 No Content Antworten und behandelt nicht gefundene Ressourcen.</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">4xx</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Fehler beim Client</h3>
+                    <p class="text-sm text-slate-600">Client-Fehler (400/401/403/404) zeigen an, dass ein fehlerhafter Request vorliegt.</p>
+                </article>
+                <article class="rounded-2xl border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.09)] space-y-2">
+                    <p class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">5xx</p>
+                    <h3 class="text-lg font-semibold text-slate-900">Serverfehler</h3>
+                    <p class="text-sm text-slate-600">Server-Fehler (500+) zeigen an, dass auf dem Server ein Problem aufgetreten ist.</p>
+                </article>
             </div>
-          </form>
         </section>
 
-        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
-          <h2 class="text-xl font-semibold text-slate-900">Artikel-Liste (PUT &amp; DELETE)</h2>
-          <p class="text-sm text-slate-600">
-            Jede Karte spiegelt PUT/DELETE wider. Erkläre URI-Design, Payload-Anforderungen und wie Konflikte behandelt werden.
-          </p>
-          <div id="items" class="space-y-3"></div>
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-3">
+            <h2 class="text-xl font-semibold text-slate-900">Live-Demo: GET /items</h2>
+            <div class="inline-flex flex-col gap-3 text-sm text-slate-600">
+                <button id="fetch-btn" class="inline-flex items-center justify-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-700 transition">
+                    GET /items
+                </button>
+                <div id="status" class="min-h-[1.5rem] text-sm font-semibold text-emerald-600"></div>
+            </div>
         </section>
 
-        <section class="rounded-3xl bg-white/90 p-6 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] space-y-3">
-          <h2 class="text-xl font-semibold text-slate-900">Statuscodes live ausprobieren</h2>
-          <p class="text-sm text-slate-600">
-            Teste Auth- und Berechtigungsfehler (401/403), nicht gefundene Ressourcen, verschiedene 5xx-Szenarien sowie den RFC-Status 418.
-          </p>
-          <div class="flex flex-wrap gap-3 pt-2">
-            <button type="button" class="rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-amber-600" id="trigger-400">
-              400 Bad Request
-            </button>
-            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-401">
-              401 Unauthorized
-            </button>
-            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-403">
-              403 Forbidden
-            </button>
-            <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-404">
-              404 Not Found
-            </button>
-            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-500">
-              500 Server Error
-            </button>
-            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-502">
-              502 Bad Gateway
-            </button>
-            <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-503">
-              503 Service Unavailable
-            </button>
-            <button type="button" class="rounded-full bg-gradient-to-r from-pink-400 via-yellow-300 to-orange-400 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-900 shadow hover:from-pink-500 hover:via-yellow-300 hover:to-orange-400" id="trigger-418">
-              418 I'm a Teapot
-            </button>
-          </div>
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-4">
+            <h2 class="text-xl font-semibold text-slate-900">Neuen Artikel erstellen (POST)</h2>
+            <p class="text-sm text-slate-600">Füge neue Artikel hinzu.</p>
+            <form id="add-form" class="grid gap-4 md:grid-cols-3">
+                <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
+                    Name
+                    <input id="add-name" type="text" placeholder="z. B. Monitor" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </label>
+                <label class="flex flex-col text-[0.7rem] font-semibold uppercase tracking-widest text-slate-500 gap-1">
+                    Anzahl
+                    <input id="add-quantity" type="number" placeholder="z. B. 2" required class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-900 shadow-inner focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                </label>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600 transition">
+                        POST
+                    </button>
+                </div>
+            </form>
         </section>
-      </main>
-    </div>
 
-    <div class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/70 px-4 py-8 backdrop-blur" id="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-title">
-      <div class="relative w-full max-w-3xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl space-y-6">
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-3">
+            <h2 class="text-xl font-semibold text-slate-900">Wie funktioniert fetch()?</h2>
+            <p class="text-sm text-slate-600">
+                <code>fetch()</code> ist ein Browser-API, um HTTP-Anfragen zu senden. Es liefert immer ein Promise mit einer <code>Response</code> zurück – auch bei Fehlern wie 404. Der Antwort-Body muss meist mit <code>response.json()</code> ausgelesen werden.
+            </p>
+            <pre class="rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto"><code>fetch('/items')
+              .then(res => res.json())
+              .then(data => console.log(data));</code></pre>
+        </section>
+
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-3">
+            <h2 class="text-xl font-semibold text-slate-900">Artikel-Liste (PUT &amp; DELETE)</h2>
+            <p class="text-sm text-slate-600">Aktualisiere oder lösche bestehende Artikel.</p>
+            <div id="items" class="space-y-3"></div>
+        </section>
+
+        <section class="rounded-3xl bg-white/90 border border-white shadow-[0_25px_70px_rgba(15,23,42,0.12)] p-6 space-y-3">
+            <h2 class="text-xl font-semibold text-slate-900">Statuscodes</h2>
+            <p class="text-sm text-slate-600">HTTP-Statuscodes zeigen den Zustand einer Anfrage an.</p>
+            <div class="flex flex-wrap gap-3 pt-2">
+                <button type="button" class="rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-amber-600" id="trigger-400">
+                    400 BAD REQUEST
+                </button>
+                <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-401">
+                    401 UNAUTHORIZED
+                </button>
+                <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-403">
+                    403 FORBIDDEN
+                </button>
+                <button type="button" class="rounded-full bg-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-slate-700" id="trigger-404">
+                    404 NOT FOUND
+                </button>
+                <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-500">
+                    500 SERVER ERROR
+                </button>
+                <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-502">
+                    502 BAD GATEWAY
+                </button>
+                <button type="button" class="rounded-full bg-rose-500 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white shadow hover:bg-rose-600" id="trigger-503">
+                    503 SERVICE UNAVAILABLE
+                </button>
+                <button type="button" class="rounded-full bg-gradient-to-r from-pink-400 via-yellow-300 to-orange-400 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-slate-900 shadow hover:from-pink-500 hover:via-yellow-300 hover:to-orange-400" id="trigger-418">
+                    418 I'M A TEAPOT
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+
+    <div class="fixed inset-0 z-50 items-center justify-center bg-slate-900/70 px-4 py-8 backdrop-blur" id="modal" hidden aria-modal="true" role="dialog" aria-labelledby="modal-title">
+    <div class="relative w-full max-w-3xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl space-y-6">
         <button class="absolute right-4 top-4 text-2xl text-slate-400 hover:text-slate-600" id="modal-close" aria-label="Modal schließen">×</button>
         <p id="modal-method" class="inline-flex rounded-full bg-slate-900 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">GET</p>
         <div class="space-y-2">
-          <h2 id="modal-title" class="text-2xl font-semibold text-slate-900">Aktion</h2>
-          <p id="modal-description" class="text-sm text-slate-600"></p>
+            <h2 id="modal-title" class="text-2xl font-semibold text-slate-900">Aktion</h2>
+            <p id="modal-description" class="text-sm text-slate-600"></p>
         </div>
         <div class="grid gap-4 md:grid-cols-3">
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Statuscode</span>
-            <strong id="modal-status" class="mt-1 block text-lg text-slate-900">200 OK</strong>
-            <small id="modal-status-info" class="text-xs text-slate-500">Alles hat funktioniert</small>
-          </div>
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Zeitstempel</span>
-            <strong id="modal-time" class="mt-1 block text-lg text-slate-900">–</strong>
-            <small class="text-xs text-slate-500">Lokale Ausführungszeit</small>
-          </div>
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Datenvolumen</span>
-            <strong id="modal-size" class="mt-1 block text-lg text-slate-900">Req 0 B · Res 0 B</strong>
-            <small class="text-xs text-slate-500">JSON-Bytes von Request/Response</small>
-          </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Statuscode</span>
+                <strong id="modal-status" class="mt-1 block text-lg text-slate-900">200 OK</strong>
+                <small id="modal-status-info" class="text-xs text-slate-500">Alles hat funktioniert</small>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Zeitstempel</span>
+                <strong id="modal-time" class="mt-1 block text-lg text-slate-900">–</strong>
+                <small class="text-xs text-slate-500">Lokale Ausführungszeit</small>
+            </div>
+            <div class="rounded-2xl border border-slate-200 p-4">
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500">Datenvolumen</span>
+                <strong id="modal-size" class="mt-1 block text-lg text-slate-900">Req 0 B · Res 0 B</strong>
+                <small class="text-xs text-slate-500">JSON-Bytes von Request/Response</small>
+            </div>
         </div>
         <div class="space-y-3">
-          <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Request-Body</h3>
-            <pre id="modal-request" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
-          </div>
-          <div>
-            <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Response</h3>
-            <pre id="modal-response" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
-          </div>
+            <div>
+                <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Request-Body</h3>
+                <pre id="modal-request" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
+            </div>
+            <div>
+                <h3 class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Response</h3>
+                <pre id="modal-response" class="mt-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">—</pre>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <script src="./app.js"></script>
-  </body>
+<script src="./app.js"></script>
+</body>
 </html>
