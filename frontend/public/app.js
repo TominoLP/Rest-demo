@@ -19,12 +19,14 @@ const modalCloseBtn = document.getElementById('modal-close');
 const modalMethod = document.getElementById('modal-method');
 const modalTitle = document.getElementById('modal-title');
 const modalDesc = document.getElementById('modal-description');
-const modalStatus = document.getElementById('modal-status');
+const modalStatusLine = document.getElementById('modal-status-line');
 const modalStatusInfo = document.getElementById('modal-status-info');
 const modalSize = document.getElementById('modal-size');
 const modalRequest = document.getElementById('modal-request');
 const modalResponse = document.getElementById('modal-response');
 const modalHeaders = document.getElementById('modal-headers');
+const modalMore = document.getElementById('modal-more');
+const modalMoreBtn = document.getElementById('modal-more-btn');
 const textEncoder = new TextEncoder();
 const trigger400Btn = document.getElementById('trigger-400');
 const trigger401Btn = document.getElementById('trigger-401');
@@ -135,8 +137,8 @@ const openModal = ({
   modalMethod.textContent = method || '-';
   modalTitle.textContent = title || 'Aktion';
   modalDesc.textContent = description || '';
-    modalStatus.textContent = status ? `${status} ${statusText || ''}`.trim() : 'unbekannt';
-    modalStatusInfo.textContent = explainStatus(status, isError);
+  modalStatusLine.textContent = status ? `${status} ${statusText || ''}`.trim() : 'unbekannt';
+  modalStatusInfo.textContent = explainStatus(status, isError);
   modalHeaders.textContent = formatHeadersBlock(headers);
   const requestText = formatPayload(requestBody);
   const responseText = formatPayload(responseBody);
@@ -147,6 +149,7 @@ const openModal = ({
   modalSize.textContent = `Req ${reqBytes} B · Res ${resBytes} B`;
   modalEl.removeAttribute('hidden');
   modalEl.classList.add('flex');
+  setMoreVisibility(false);
     document.body.style.overflow = 'hidden';
 };
 
@@ -833,3 +836,23 @@ trigger418Btn.addEventListener('click', triggerTeapot);
 
 // Load initial state
 fetchItems();
+const setMoreVisibility = (visible) => {
+  if (!modalMore || !modalMoreBtn) return;
+  if (visible) {
+    modalMore.classList.remove('hidden');
+    modalMoreBtn.textContent = 'Weniger anzeigen';
+    modalMoreBtn.setAttribute('aria-expanded', 'true');
+  } else {
+    modalMore.classList.add('hidden');
+    modalMoreBtn.textContent = 'Mehr anzeigen';
+    modalMoreBtn.setAttribute('aria-expanded', 'false');
+  }
+};
+
+if (modalMoreBtn) {
+  modalMoreBtn.addEventListener('click', () => {
+    if (!modalMore) return;
+    const isVisible = !modalMore.classList.contains('hidden');
+    setMoreVisibility(!isVisible);
+  });
+}
