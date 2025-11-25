@@ -75,6 +75,7 @@
         <button class="tab-btn" data-tab="status-codes">HTTP Statuscodes</button>
         <button class="tab-btn" data-tab="fetch">fetch()</button>
         <button class="tab-btn" data-tab="verbs">GET / POST / PUT / DELETE</button>
+        <button class="tab-btn" data-tab="fazit">Fazit</button>
     </nav>
 </div>
 
@@ -98,7 +99,26 @@
                 Die Küche bereitet das Gewünschte zu.
 Du musst nicht wissen, wie das Gericht gekocht wird – du bekommst einfach das Ergebnis zurück.
             </ul>
+            <div class="mt-4">
+                <button id="api-examples-btn" 
+                        class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white">
+                    Beispiele anzeigen
+                </button>
+
+                <ul id="api-examples-list" class="mt-4 ml-6 list-disc text-slate-600 hidden">
+                    <li><strong>Google Maps in einer App:</strong>  
+                        Eine App ruft Standortdaten oder Routen über eine API ab.
+                    </li>
+                    <li><strong>Login mit Google / Facebook:</strong>  
+                        Apps kommunizieren über OAuth-APIs mit Google.
+                    </li>
+                    <li><strong>Wetter-App:</strong>  
+                        Die App fragt Temperaturen über eine Wetter-API ab.
+                    </li>
+                </ul>
+            </div>
         </div>
+
     </section>
 
     <!-- TAB 2: SOAP -->
@@ -118,6 +138,80 @@ Du musst nicht wissen, wie das Gericht gekocht wird – du bekommst einfach das 
                 <li><strong>Sehr sicher, aber schwerfälliger als REST</strong></li>
                 SOAP bietet starke Sicherheitsmechanismen, ist aber im Vergleich zu REST umfangreicher, langsamer und komplizierter.
             </ul>
+            <div class="mt-6">
+    <button id="soap-examples-btn" 
+            class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white">
+        Beispiele anzeigen
+    </button>
+
+     <button id="soap-compare-btn"
+        class="rounded-full bg-purple-600 px-5 py-2 text-sm font-semibold text-white">
+        REST vs. SOAP
+    </button>
+
+    <div id="soap-examples-box" class="mt-4 space-y-4 hidden">
+        <h3 class="text-lg font-semibold text-slate-700">SOAP lebt von XML – Beispiel</h3>
+
+        <!-- Beispiel Request -->
+        <div>
+            <p class="text-sm text-slate-600 font-semibold">Beispiel-Request:</p>
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-x-auto shadow-inner">
+&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:bank="http://bank.example.com"&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;bank:getBalance&gt;
+         &lt;bank:accountId&gt;12345&lt;/bank:accountId&gt;
+      &lt;/bank:getBalance&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
+        </div>
+
+        <!-- Beispiel Response -->
+        <div>
+            <p class="text-sm text-slate-600 font-semibold">Beispiel-Response:</p>
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-sm overflow-x-auto shadow-inner">
+&lt;soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"&gt;
+   &lt;soapenv:Body&gt;
+      &lt;getBalanceResponse&gt;
+         &lt;balance&gt;542.30&lt;/balance&gt;
+      &lt;/getBalanceResponse&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;</pre>
+        </div>
+
+    
+    
+    </div>
+    <div id="soap-compare-box" class="mt-4 hidden">
+
+    <h3 class="text-lg font-semibold text-slate-700">REST vs. SOAP</h3>
+
+    <div class="rounded-2xl border bg-white/90 backdrop-blur p-4 shadow">
+        <table class="w-full text-sm text-slate-700">
+            <tr>
+                <td class="font-semibold p-2">REST</td>
+                <td class="font-semibold p-2">SOAP</td>
+            </tr>
+            <tr>
+                <td class="p-2">JSON</td>
+                <td class="p-2">XML</td>
+            </tr>
+            <tr>
+                <td class="p-2">Leicht</td>
+                <td class="p-2">Komplex</td>
+            </tr>
+            <tr>
+                <td class="p-2">Schnell</td>
+                <td class="p-2">Schwerfällig</td>
+            </tr>
+            <tr>
+                <td class="p-2">Web-Standard</td>
+                <td class="p-2">Enterprise-Standard</td>
+            </tr>
+        </table>
+    </div>
+</div>
         </div>
     </section>
 
@@ -266,6 +360,24 @@ fetch('/items')
         </div>
     </section>
 
+    <!-- TAB 8: FAZIT -->
+    <section id="fazit" class="tab-content">
+    <div class="rounded-3xl bg-white/90 backdrop-blur p-6 border shadow space-y-4 mt-7">
+        <h2 class="text-xl font-semibold text-slate-800">Fazit</h2>
+
+        <p class="text-slate-600 leading-relaxed">
+            Zusammengefasst haben wir heute gesehen, was APIs sind, wie REST funktioniert, 
+            warum SOAP früher wichtig war, welche HTTP-Verben es gibt und wie man mit 
+            <code>fetch()</code> moderne API-Anfragen stellt.
+        </p>
+
+        <p class="text-slate-600 leading-relaxed">
+            Mit unserer Demo-Seite kann man das alles live ausprobieren und direkt erleben, 
+            wie APIs arbeiten.
+        </p>
+    </div>
+</section>
+
 </div>
 
 <!-- MODAL (original) -->
@@ -329,6 +441,51 @@ fetch('/items')
             btn.classList.add("active");
             document.getElementById(btn.dataset.tab).classList.add("active");
         });
+    });
+    const btn = document.getElementById("api-examples-btn");
+    const list = document.getElementById("api-examples-list");
+
+    btn.addEventListener("click", () => {
+
+        list.classList.toggle("hidden");
+
+        if (list.classList.contains("hidden")) {
+            btn.textContent = "Beispiele anzeigen";
+        } else {
+            btn.textContent = "Beispiele ausblenden";
+        }
+    });
+      const soapBtn = document.getElementById("soap-examples-btn");
+    const soapCompareBtn = document.getElementById("soap-compare-btn");
+
+    const soapBox = document.getElementById("soap-examples-box");
+    const compareBox = document.getElementById("soap-compare-box");
+    soapBtn.addEventListener("click", () => {
+        soapBox.classList.toggle("hidden");
+
+
+        if (!soapBox.classList.contains("hidden")) {
+            compareBox.classList.add("hidden");
+        }
+
+        soapBtn.textContent = soapBox.classList.contains("hidden")
+            ? "Beispiele anzeigen"
+            : "Beispiele ausblenden";
+        soapCompareBtn.textContent = "REST vs. SOAP";
+    });
+
+    soapCompareBtn.addEventListener("click", () => {
+        compareBox.classList.toggle("hidden");
+
+    
+        if (!compareBox.classList.contains("hidden")) {
+            soapBox.classList.add("hidden");
+        }
+
+        soapCompareBtn.textContent = compareBox.classList.contains("hidden")
+            ? "REST vs. SOAP"
+            : "REST vs. SOAP ausblenden";
+        soapBtn.textContent = "Beispiele anzeigen";
     });
 </script>
 
