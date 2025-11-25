@@ -45,6 +45,9 @@
             <p class="inline-flex items-center rounded-full bg-indigo-100/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
                 IT12A – Tom Werth – Kevin Schmitt
             </p>
+             <p class=" inline-flex items-center rounded-full bg-indigo-100/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
+                25.11.2025
+            </p>
             <h1 class="text-3xl font-semibold text-slate-900">APIs – SOAP – REST – HTTP &amp; Demo</h1>
             <p class="text-slate-600 text-base">
                 Eine übersichtliche Einführung in APIs, den Vorgänger SOAP, moderne REST-APIs, HTTP-Verben, Statuscodes und fetch(), inklusive Live-Demo.
@@ -81,15 +84,19 @@
     <!-- TAB 1: API -->
     <section id="api" class="tab-content active">
         <div class="rounded-3xl bg-white/90 backdrop-blur p-6 border shadow space-y-3 mt-7">
-            <h2 class="text-xl font-semibold">Was ist eine API?</h2>
+            <h2 class="text-xl text-slate-600 font-semibold">Was ist eine API?</h2>
             <p class="text-slate-600">
-                Eine <strong>API (Application Programming Interface)</strong> ist eine definierte Schnittstelle, über die Programme miteinander kommunizieren können.
+                Eine <strong>API (Application Programming Interface)</strong> ist eine klar definierte Schnittstelle, über die verschiedene Programme oder Systeme miteinander kommunizieren können. Sie legt fest, <strong>welche Funktionen verfügbar sind</strong> und <strong>wie andere Anwendungen daruf zugreifen können</strong> , ohne die internen Abläufe kennen zu müssen.
             </p>
             <p class="text-slate-600">Vergleich: Ein Restaurant</p>
             <ul class="list-disc ml-6 text-slate-600">
-                <li><strong>du als Gast</strong> = Benutzer</li>
-                <li><strong>Menü</strong> = API (zeigt was möglich ist)</li>
-                <li><strong>Küche</strong> = Server (führt die Befehle aus)</li>
+                <li><strong>der Gast = Benutzer</strong> </li>
+                Du bestellst, was du haben möchtest.
+                <li><strong>Menü = API </strong>(zeigt was möglich ist)</li>
+                Das Menü zeigt dir, welche Gerichte (also welche Funktionen) verfügbar sind und wie du sie bestellen kannst.
+                <li><strong>Küche = Server </strong>(führt die Befehle aus)</li>
+                Die Küche bereitet das Gewünschte zu.
+Du musst nicht wissen, wie das Gericht gekocht wird – du bekommst einfach das Ergebnis zurück.
             </ul>
         </div>
     </section>
@@ -98,13 +105,18 @@
     <section id="soap" class="tab-content">
         <div class="rounded-3xl bg-white/90 backdrop-blur p-6 border shadow space-y-4">
             <h2 class="text-xl font-semibold">SOAP – Der Vorgänger</h2>
-            <p class="text-slate-600">SOAP (Simple Object Access Protocol) war viele Jahre der Standard für Webservices.</p>
+            <p class="text-slate-600">SOAP (Simple Object Access Protocol) war über viele Jahre hinweg der etablierte Standard für Webservices, bevor modernere Architekturen wie REST populär wurden.</p>
             <ul class="list-disc ml-6 text-slate-600">
-                <li>Pflicht: XML als Format</li>
-                <li>Streng, komplex, formal</li>
-                <li>WSDL für Schnittstellenbeschreibung</li>
-                <li>Gut geeignet für Banken/Unternehmen</li>
-                <li>Sehr sicher, aber schwerfälliger als REST</li>
+                <li><strong>Verpflichtend: XML als Datenformat</strong></li>
+                SOAP-Nachrichten müssen immer in XML strukturiert sein.
+                <li><strong>Streng, komplex, formal</strong></li>
+                Klare Regeln und umfangreiche Vorgaben machen SOAP robust, aber weniger flexibel.
+                <li><strong>WSDL für Schnittstellenbeschreibung</strong></li>
+                Über eine WSDL-Datei (Web Services Description Language) wird exakt definiert, welche Funktionen ein Service bereitstellt.
+                <li><strong>Gut geeignet für Banken/Unternehmen</strong></li>
+                Dort werden hohe Anforderungen an Standardisierung, Transaktionssicherheit und Zuverlässigkeit gestellt.
+                <li><strong>Sehr sicher, aber schwerfälliger als REST</strong></li>
+                SOAP bietet starke Sicherheitsmechanismen, ist aber im Vergleich zu REST umfangreicher, langsamer und komplizierter.
             </ul>
         </div>
     </section>
@@ -114,8 +126,7 @@
         <div class="rounded-3xl bg-white/90 backdrop-blur p-6 border shadow space-y-5">
             <h2 class="text-xl font-semibold">REST – Moderne APIs</h2>
             <p class="text-slate-600">
-                REST (Representational State Transfer) nutzt die vorhandenen Möglichkeiten des Internets – vor allem HTTP-Verben und Statuscodes.
-            </p>
+                REST (Representational State Transfer) nutzt einfache, einheitliche Standards, um klar zu definieren, wie Clients mit dem Server interagieren – effizient, verständlich und weltweit etabliert.
 
             <!-- Deine ursprünglichen Erklärkärtchen → übernommen -->
             <section class="space-y-5">
@@ -176,14 +187,21 @@
         <div class="rounded-3xl bg-white/90 backdrop-blur p-6 border shadow space-y-4">
             <h2 class="text-xl font-semibold">fetch()</h2>
             <p class="text-slate-600">
-                <code>fetch()</code> ist das moderne Browser-API für HTTP-Anfragen. Es liefert immer ein Promise zurück.
+                <code>fetch()</code> ist das moderne, eingebaute Browser-API, um HTTP-Anfragen zu senden.
+Es arbeitet vollständig asynchron und gibt immer ein Promise zurück, wodurch der Code klar und übersichtlich bleibt.
             </p>
             <pre class="rounded-2xl bg-slate-900 px-4 py-3 text-sm text-slate-100 overflow-x-auto">
 fetch('/items')
-  .then(res => res.json())
-  .then(data => console.log(data));
-      </pre>
+    .then(res => res.json())
+    .then(data => console.log(data));</pre>
+        <h2 class="text-xl font-semibold">Ablauf</h2>
+        <ul class="list-disc ml-6 text-slate-600">
+<li> <code>fetch('/items')</code> => sendet eine Anfrage an den Server.</li>
+        <li> <code>.then(res => res.json())</code> => wandelt die Antwort in JSON-Daten um.</li>
+        <lI> <code>.then(data => console.log(data))</code> => verarbeitet die empfangten Daten.</lI>
         </div>
+        </ul>
+        
     </section>
 
     <!-- TAB 6: VERBS / CRUD DEMO -->
